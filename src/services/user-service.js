@@ -2,7 +2,8 @@ const UserRepository=require("../repository/user-repository.js")
 const {JWT_KEY}=require("../config/serverConfig.js")
 const jwt=require("jsonwebtoken");
 const validator=require("validator")
-const bcrypt=require("bcrypt")
+const bcrypt=require("bcrypt");
+const { response } = require("express");
 class UserService{
     constructor(){
         this.userRepository=new UserRepository();
@@ -16,11 +17,51 @@ class UserService{
             throw new Error("invalid email and password");
            }
 const user=await this.userRepository.create(data);
-            return user;
+            return {
+                id:user.id,
+                email:user.email,
+                message:"user created successfully"
+            }
         } catch (error) {
            console.log("something went wrong in user service");
            throw error; 
         }
+    }
+    async signIn(email,plainPassword){
+try {
+    const user= await this.userRepository.getByEmail(email);
+    if(!user){
+        throw new Error("invalid credential")
+    }
+    const passwordMatch=this.checkPassword(plainPassword,user.password);
+    if(!passwordMatch){
+        console.log("password does not match");
+        throw {error:"Incorrect password"}
+    }
+    const newJwt=this.createToken({email:user.email,id:user.id});
+    return {
+        message:"successfully get the user"
+    }
+} catch (error) {
+    console.log("something went wrong in user service");
+    throw error; 
+}
+    }
+    async isAuthenticated(token){
+try {
+    const isTokenVerified=this.verifyToken(token);
+    if(!isTokenVerified){
+        throw {error}
+    }
+    const user=this.userRepository.getById(response.id);
+    if(!user){
+        throw {error:"no user with the corressponding token exists"}
+    }
+    return user.id;
+} catch (error) {
+  console.log("something went wrong in the auth process");
+  throw error;  
+}
     }
      createToken(user){
 try {
@@ -40,7 +81,7 @@ try {
             throw error;
         }
             }
-            checkPassword(userInputPlainPassword,encryptedPassword){
+    checkPassword(userInputPlainPassword,encryptedPassword){
                try {
               const result=  bcrypt.compareSync(userInputPlainPassword,encryptedPassword);
               return result;
