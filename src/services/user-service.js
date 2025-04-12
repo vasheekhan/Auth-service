@@ -2,6 +2,7 @@ const UserRepository=require("../repository/user-repository.js")
 const {JWT_KEY}=require("../config/serverConfig.js")
 const jwt=require("jsonwebtoken");
 const validator=require("validator")
+const bcrypt=require("bcrypt")
 class UserService{
     constructor(){
         this.userRepository=new UserRepository();
@@ -38,6 +39,15 @@ try {
             console.log("something went wrong in token verification")
             throw error;
         }
+            }
+            checkPassword(userInputPlainPassword,encryptedPassword){
+               try {
+              const result=  bcrypt.compareSync(userInputPlainPassword,encryptedPassword);
+              return result;
+               } catch (error) {
+                console.log("something went wrong in password comparison");
+                throw error;
+               }
             }
  
 }
