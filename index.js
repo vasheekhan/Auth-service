@@ -14,7 +14,8 @@ app.listen(PORT,async()=>{
     // if(process.env.DB_SYNC){
     //     db.sequelize.sync({alter:true})
     // }
-    // const u1= await User.findByPk(1);
+    // const u1= await User.findByPk(5);
+    // console.log("user",u1)
     // const r1=await Role.findByPk(2);
     // u1.addRole(r1)   
 
