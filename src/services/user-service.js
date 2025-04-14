@@ -39,9 +39,7 @@ try {
         throw {error:"Incorrect password"}
     }
     const newJwt=this.createToken({email:user.email,id:user.id});
-    return {
-        message:"successfully get the user"
-    }
+    return newJwt;
 } catch (error) {
     console.log("something went wrong in user service");
     throw error; 
@@ -53,7 +51,7 @@ try {
     if(!isTokenVerified){
         throw {error}
     }
-    const user=this.userRepository.getById(response.id);
+    const user=await this.userRepository.getById(isTokenVerified.id);
     if(!user){
         throw {error:"no user with the corressponding token exists"}
     }
